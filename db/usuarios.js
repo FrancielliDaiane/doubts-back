@@ -1,6 +1,7 @@
 // db/usuarios.js
 import conexao from '../config/db.js';
 
+
 // Função para cadastrar um usuário
 export function cadastrarUsuario(nome, email, senha, callback) {
   const sql = 'INSERT INTO usuarios (nome, email, senha) VALUES (?, ?, ?)';
@@ -36,3 +37,48 @@ export function deletarUsuario(id, callback) {
     callback(null, result);
   });
 }
+
+// db/usuarios.js
+export const salvarCaminhoImagemNoBanco = async (userId, caminho) => {
+  return new Promise((resolve, reject) => {
+    const sql = `UPDATE usuarios SET foto_url = ? WHERE id = ?`;
+    conexao.query(sql, [caminho, userId], (err, results) => {
+      if (err) return reject(err);
+      resolve(results);
+    });
+  });
+};
+
+
+
+export async function atualizarFotoUsuario(userId, imagem) {
+  try {
+    const sql = 'UPDATE usuarios SET foto_url = ? WHERE id = ?';
+
+    const result = await new Promise((resolve, reject) => {
+      conexao.query(sql, [imagem, userId], (err, results) => {
+        if (err) return reject(err);
+        resolve(results);
+      });
+    });
+
+    if (result.affectedRows === 0) {
+      throw new Error('Usuário não encontrado.');
+    }
+
+    return result;
+  } catch (error) {
+    console.error('Erro ao atualizar a foto do usuário:', error);
+    throw error;
+  }
+}
+
+
+
+// Função para buscar a URL da foto do usuário
+export async function buscarFotoUsuarioPorId(id) {
+  const [rows] = await conexao.promise().query('SELECT foto_url FROM usuarios WHERE id = ?', [id]);
+  return rows[0];
+}
+
+

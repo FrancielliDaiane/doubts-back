@@ -2,14 +2,21 @@
 import conexao from '../config/db.js';
 
 // Função para criar um canal
-export function criarCanal(nome, descricao, foto_url, usuario_criador_id, callback) {
-  const sql = 'INSERT INTO canais (nome, descricao, foto_url, usuario_criador_id) VALUES (?, ?, ?, ?)';
-  conexao.query(sql, [nome, descricao, foto_url || null, usuario_criador_id], (err, result) => {
-    if (err) return callback(err, null);
-    callback(null, result);
+export function criarCanal(nome, descricao, foto_url, usuario_criador_id) {
+  return new Promise((resolve, reject) => {
+    descricao = descricao || '';
+    foto_url = foto_url || '';
+
+    const sql = 'INSERT INTO canais (nome, descricao, foto_url, usuario_criador_id) VALUES (?, ?, ?, ?)';
+    conexao.query(sql, [nome, descricao, foto_url, usuario_criador_id], (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
   });
 }
 
+
+  
 // Função para adicionar um usuário a um canal
 export function adicionarUsuarioCanal(usuario_id, canal_id, callback) {
   const sql = 'INSERT INTO usuarios_canais (usuario_id, canal_id) VALUES (?, ?)';
@@ -53,5 +60,78 @@ export function excluirCanal(id, callback) {
   conexao.query(sql, [id], (err, result) => {
     if (err) return callback(err, null);
     callback(null, result);
+  });
+}
+
+export function buscarCanaisPorUsuario(usuario_id, callback) {
+    const sql = `
+      SELECT c.id, c.nome, c.descricao, c.foto_url, c.data_criacao
+      FROM usuarios_canais uc
+      JOIN canais c ON uc.canal_id = c.id
+      WHERE uc.usuario_id = ?
+    `;
+    conexao.query(sql, [usuario_id], (err, results) => {
+      if (err) return callback(err, null);
+      callback(null, results);
+    });
+  }
+
+export function buscarTodosCanais(callback) {
+  const sql = `SELECT id, nome, foto_url, usuario_criador_id FROM canais`;
+  conexao.query(sql, (err, results) => {
+    if (err) return callback(err, null);
+
+    // Mapear para adicionar o domínio completo caso foto_url seja só o nome do arquivo
+    const baseUrl = 'https://apidoubts.dev.vilhena.ifro.edu.br/uploads_canais/';
+    const resultsComUrlCompleta = results.map(canal => {
+      return {
+        ...canal,
+        foto_url: canal.foto_url.startsWith('http')
+          ? canal.foto_url
+          : baseUrl + canal.foto_url
+      };
+    });
+
+    callback(null, resultsComUrlCompleta);
+  });
+}
+
+
+  
+  
+// db/canais.js
+
+export function atualizarFotoCanais(canalId, fotoUrl) {
+  return new Promise((resolve, reject) => {
+    const sql = 'UPDATE canais SET foto_url = ? WHERE id = ?';
+    conexao.query(sql, [fotoUrl, canalId], (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+}
+
+  
+export function buscarCanaisPorUsuario(usuario_id, callback) {
+  const sql = `
+    SELECT c.id, c.nome, c.descricao, c.foto_url, c.data_criacao
+    FROM usuarios_canais uc
+    JOIN canais c ON uc.canal_id = c.id
+    WHERE uc.usuario_id = ?
+  `;
+  conexao.query(sql, [usuario_id], (err, results) => {
+    if (err) return callback(err, null);
+
+    const baseUrl = 'https://apidoubts.dev.vilhena.ifro.edu.br/uploads_canais/';
+    const resultsComUrlCompleta = results.map(canal => {
+      return {
+        ...canal,
+        foto_url: canal.foto_url.startsWith('http')
+          ? canal.foto_url
+          : baseUrl + canal.foto_url
+      };
+    });
+
+    callback(null, resultsComUrlCompleta);
   });
 }
