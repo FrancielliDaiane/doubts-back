@@ -63,18 +63,6 @@ export function excluirCanal(id, callback) {
   });
 }
 
-export function buscarCanaisPorUsuario(usuario_id, callback) {
-    const sql = `
-      SELECT c.id, c.nome, c.descricao, c.foto_url, c.data_criacao
-      FROM usuarios_canais uc
-      JOIN canais c ON uc.canal_id = c.id
-      WHERE uc.usuario_id = ?
-    `;
-    conexao.query(sql, [usuario_id], (err, results) => {
-      if (err) return callback(err, null);
-      callback(null, results);
-    });
-  }
 
 export function buscarTodosCanais(callback) {
   const sql = `SELECT id, nome, foto_url, usuario_criador_id FROM canais`;
