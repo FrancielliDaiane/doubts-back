@@ -97,7 +97,7 @@ const storageCanais = multer.diskStorage({
   filename: (req, file, cb) => cb(null, Date.now() + path.extname(file.originalname)),
 });
 
-// Inicializa o Multer
+// Inicializa o Multerr
 const upload = multer({ storage });
 const uploadCanais = multer({ storage: storageCanais });
 
