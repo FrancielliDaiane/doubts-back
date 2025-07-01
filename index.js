@@ -10,7 +10,7 @@ app.use(bodyParser.json());
 
 
 // Middleware para verificar se o usuário está autenticado
-//export function autenticarUsuario(req, res, next) {
+//export function autenticarUsuareq, res, next) {
   // Middleware para verificar se o usuário está autenticado
 function autenticarUsuario(req, res, next) {
   const token = req.headers['authorization'];
