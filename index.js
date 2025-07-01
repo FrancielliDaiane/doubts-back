@@ -88,7 +88,7 @@ app.post('/cadastro', (req, res) => {
   });
 });
 
-// Rota para listar todos os usuários
+// Rota para listar todos os usuário
 app.get('/usuarios', (req, res) => {
   listarUsuarios((err, users) => {
     if (err) {
