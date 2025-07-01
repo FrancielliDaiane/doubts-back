@@ -241,7 +241,7 @@ app.put('/usuarios/:id', (req, res) => {
   });
 });
 
-// Deletar usuário
+// Deletar usuár
 app.delete('/usuarios/:id', (req, res) => {
   const { id } = req.params;
 
